@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Good_Shop {
+    private Integer id;
     //private Integer goodId;//这个是自动生成的
     private String type;
     private String name;

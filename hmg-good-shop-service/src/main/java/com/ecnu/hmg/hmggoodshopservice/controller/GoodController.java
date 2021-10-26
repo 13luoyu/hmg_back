@@ -5,6 +5,7 @@ import com.ecnu.hmg.hmggoodshopservice.entity.Good;
 import com.ecnu.hmg.hmggoodshopservice.entity.Good_Shop;
 import com.ecnu.hmg.hmggoodshopservice.service.GoodService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @RestController
+@CrossOrigin
 public class GoodController {
     @Autowired
     GoodService goodService;
@@ -34,6 +36,11 @@ public class GoodController {
     public List<Good> getGoodsByType(String type, @RequestParam(required = false) Integer pageNum){
         if(pageNum==null)   pageNum=0;
         return goodService.getGoodsByType(type, pageNum);
+    }
+
+    @RequestMapping("/get/good")
+    public Good getGoodById(Integer id){
+        return goodService.getGoodById(id);
     }
 
     @RequestMapping("/search/good/shop")

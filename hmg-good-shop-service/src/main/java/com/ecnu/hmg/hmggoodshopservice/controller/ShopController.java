@@ -5,12 +5,14 @@ import com.ecnu.hmg.hmggoodshopservice.entity.Good;
 import com.ecnu.hmg.hmggoodshopservice.entity.Shop;
 import com.ecnu.hmg.hmggoodshopservice.service.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class ShopController {
     @Autowired
     ShopService shopService;

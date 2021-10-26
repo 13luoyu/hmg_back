@@ -18,46 +18,46 @@ public class UserService {
     protected SessionAndCookie sc;
 
     public String addUser(User user){
-        if(user.getUsername()==null || user.getPassword()==null)
-            return JSON.toJSONString("Username and Password are indispensable");
+        if(user.getUsername()==null || user.getPassword()==null || user.getEmail()==null)
+            return "Username and Password and email are indispensable";
         user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
         try{
             userMapper.save(user);
-            return JSON.toJSONString("Register success");
+            return "Register success";
         }catch (Exception e){
             e.printStackTrace();
-            return JSON.toJSONString("Regsiter failed");
+            return "Regsiter failed";
         }
     }
 
     public String login(User user){
         if(user.getUsername()==null || user.getPassword()==null)
-            return JSON.toJSONString("Username and Password are indispensable");
+            return "Username and Password are indispensable";
         try{
             User u =userMapper.findUserByUsername(user.getUsername());
             if(u==null){
-                return JSON.toJSONString("username not exist");
+                return "username not exist";
             }
             String password=DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
             if(u.getPassword().equals(password)){
                 String sessionId=sc.createNewSession(user.getUsername());
                 sc.createNewCookie(sessionId);
-                return JSON.toJSONString("login success");
+                return "login success";
             }else{
-                return JSON.toJSONString("wrong password");
+                return "wrong password";
             }
         }catch (Exception e){
             e.printStackTrace();
-            return JSON.toJSONString("Login error");
+            return "Login error";
         }
     }
 
     public String logout(){
         String sessionId=sc.getSessionId();
         if(sessionId==null){
-            return JSON.toJSONString("No cookie&session found, please login first");
+            return "No cookie&session found, please login first";
         }
         sc.invalidSession();
-        return JSON.toJSONString("Logout success");
+        return "Logout success";
     }
 }

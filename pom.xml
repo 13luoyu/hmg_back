@@ -11,6 +11,7 @@
     <modules>
         <module>hmg-user-service</module>
         <module>hmg-good-shop-service</module>
+        <module>hmg-mq</module>
     </modules>
     <packaging>pom</packaging>
 

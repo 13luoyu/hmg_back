@@ -10,5 +10,6 @@ import java.util.List;
 public interface G_SMapper extends JpaRepository<G_S, Integer> {
 
     List<G_S> findAllByShopId(Integer shopId);
+    G_S findG_SByGoodId(Integer goodId);
 
 }

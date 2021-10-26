@@ -52,10 +52,11 @@ public class ViewService {
         }, PageRequest.of(pageNum, 9, Sort.by("id").descending())).getContent();
     }
 
-    public String addNewView(Integer goodid){
+    public String addNewView(String username, Integer goodid){
         UserView userView=new UserView();
         userView.setGoodid(goodid);
-        String username=sessionAndCookie.getUsernameBySessionId(
+        if(username==null)
+            username=sessionAndCookie.getUsernameBySessionId(
                 sessionAndCookie.getSessionId());
         userView.setUsername(username);
 

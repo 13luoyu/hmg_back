@@ -1,18 +1,18 @@
-package com.ecnu.hmg.hmggoodshopservice.config;
+package com.ecnu.hmg.mq.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 虚拟主机：一个虚拟主机持有一组交换机、队列和绑定。
@@ -43,8 +43,10 @@ import java.util.Map;
  * x-match = all ：表示所有的键值对都匹配才能接受到消息
  * x-match = any ：表示只要有键值对匹配就能接受到消息
  */
+
 @Configuration
-public class RabbitMQConfig {
+public class mqconfig {
+
     @Value("${spring.rabbitmq.host}")
     private String host;
     @Value("${spring.rabbitmq.port}")
@@ -56,6 +58,10 @@ public class RabbitMQConfig {
     /**
      * 声明ConnectionFactory
      */
+
+    @Autowired
+    private RabbitAdmin rabbitAdmin;
+
     @Bean
     public ConnectionFactory connectionFactory(){
         CachingConnectionFactory connectionFactory=new CachingConnectionFactory(host, port);
@@ -83,63 +89,50 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 声明队列
+     创建队列参数1:队列名;参数2:是否持久化一般设置成true;参数3:队列是否独占此链接一般设置为false;
+     参数4:队列不再使用时是否删除,一般设置false;参数5队列参数有就设置没有为null
      */
     @Bean
-    public Queue queue(){
-        return new Queue("queue", false, false, false);
+    public Queue queue1(){
+        return new Queue("queue1", true, false, false);
     }
 
-    /**
-     * 声明topic交换机
-     */
     @Bean
-    TopicExchange topicExchange(){
-        return new TopicExchange("topic-exchange");
+    public Queue queue2(){
+        return new Queue("queue2", true, false, false);
     }
 
-    /**
-     * 将队列和交换机进行绑定，并指定路由键
-     */
     @Bean
-    Binding topicBinding(Queue queue, TopicExchange topicExchange){
-        return BindingBuilder.bind(queue).to(topicExchange).with("mq.#");
+    public DirectExchange directExchange(){
+        //参数1:交换机名  参数2:是否可持久化 一般设置true 参数3:一不再使用是否自动删除 一般设为false
+        return new DirectExchange("direct-exchange", true, false);
     }
 
-    /**
-     * 声明fanout交换机
-     */
     @Bean
-    FanoutExchange fanoutExchange(){
-        return new FanoutExchange("fanout-exchange");
+    public Binding binding1(){
+        return BindingBuilder.bind(queue1()).to(directExchange()).with("user");
     }
 
-    /**
-     * 将队列与fanout交换机进行绑定
-     */
     @Bean
-    Binding fanoutBinding(Queue queue, FanoutExchange fanoutExchange){
-        return BindingBuilder.bind(queue).to(fanoutExchange);
+    public Binding binding2(){
+        return BindingBuilder.bind(queue2()).to(directExchange()).with("goodshop");
     }
 
-    /**
-     * 声明Headers交换机
-     */
+    //创建初始化RabbitAdmin对象
     @Bean
-    HeadersExchange headersExchange(){
-        return new HeadersExchange("headers-exchange");
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
+        // 只有设置为 true，spring 才会加载 RabbitAdmin 这个类
+        rabbitAdmin.setAutoStartup(true);
+        return rabbitAdmin;
     }
 
-    /**
-     * 将队列和headers交换机进行绑定
-     */
     @Bean
-    Binding headersBinding(Queue queue, HeadersExchange headersExchange){
-        Map<String, Object> map=new HashMap<>();
-        map.put("first", "M");
-        map.put("second", "Q");
-        return BindingBuilder.bind(queue).to(headersExchange).whereAny(map).match();
-        //或whereAll(map).match()
+    public void createExchangeAndQueue(){
+        rabbitAdmin.declareQueue(queue1());
+        rabbitAdmin.declareQueue(queue2());
+        rabbitAdmin.declareExchange(directExchange());
+        rabbitAdmin.declareBinding(binding1());
+        rabbitAdmin.declareBinding(binding2());
     }
-
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ecnu.hmg.hmggoodshopservice.entity.G_S;
 import com.ecnu.hmg.hmggoodshopservice.entity.Good;
 import com.ecnu.hmg.hmggoodshopservice.entity.Good_Shop;
+import com.ecnu.hmg.hmggoodshopservice.entity.Shop;
 import com.ecnu.hmg.hmggoodshopservice.mapper.G_SMapper;
 import com.ecnu.hmg.hmggoodshopservice.mapper.GoodMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class GoodService {
     private GoodMapper goodMapper;
     @Autowired
     private G_SMapper g_sMapper;
+    @Autowired
+    private ShopService shopService;
 
     public List<Good> getGoods(int pageNum){
         Pageable pageable=PageRequest.of(pageNum, 9);
@@ -35,7 +38,11 @@ public class GoodService {
     }
 
     public Good getGoodById(int id){
-        return goodMapper.findGoodById(id);
+        Good good=goodMapper.findGoodById(id);
+        G_S g_s=g_sMapper.findG_SByGoodId(id);
+        Shop shop=shopService.getShopById(g_s.getShopId());
+        good.setType(shop.getName());
+        return good;
     }
 
     public String addNewGood(Good_Shop good_shop){

@@ -52,10 +52,11 @@ public class LikeService {
         }, PageRequest.of(pageNum, 9, Sort.by("id").descending())).getContent();
     }
 
-    public String addNewLike(Integer goodid){
+    public String addNewLike(String username, Integer goodid){
         UserLike userLike =new UserLike();
         userLike.setGoodid(goodid);
-        String username=sessionAndCookie.getUsernameBySessionId(
+        if(username==null)
+            username=sessionAndCookie.getUsernameBySessionId(
                 sessionAndCookie.getSessionId());
         userLike.setUsername(username);
 
